@@ -53,9 +53,9 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
         }
         
         if ($this->db = new SQLiteDatabase($this->dbfile, 0666, $sqliteerror)) { 
-            if (!$this->db->query("SELECT COUNT(*) FROM " . $this->table)) {
+            if (!@$this->db->query("SELECT COUNT(*) FROM " . $this->table)) {
                 $sql = 'CREATE TABLE ' . sqlite_escape_string($this->table) . ' (id NVARCHAR(32) UNIQUE PRIMARY KEY, value TEXT, timestamp REAL)';
-                $this->db->query($this->db, $sql);
+                $this->db->query($sql);
             }
             
         } else {
