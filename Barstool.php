@@ -38,8 +38,10 @@ class Barstool
      * 
      */
     public function init($options) {
+        
+        
         if ($options['adaptor']) {
-            $this->loadAdaptor($options['adaptor']);
+            $this->loadAdaptor($options);
         } else {
             throw new Exception('missing adaptor from init options');
         }
@@ -52,18 +54,19 @@ class Barstool
      * @return boolean
      * @author Ed Finkler
      */
-    protected function loadAdaptor($adaptor) {
-        if (in_array($options['adaptor'], $this->adaptors)) {
+    protected function loadAdaptor($options) {
+        
+        if (array_key_exists($options['adaptor'], $this->adaptors)) {
             require_once(
                 dirname(__FILE__)
                 .DIRECTORY_SEPARATOR.'Barstool'
                 .DIRECTORY_SEPARATOR.'Adaptor'
                 .DIRECTORY_SEPARATOR.$options['adaptor'].'.php'
             );
-            $this->adaptor = new $this->adaptors[$options['adaptor']];
+            $this->adaptor = new $this->adaptors[$options['adaptor']]($options);
             return true;
         } else {
-            throw new Exception('invalid adaptor type from init options');
+            throw new Exception('invalid adaptor type "'.$options['adaptor'].'" from init options');
             return false;
         }
     }
@@ -77,7 +80,7 @@ class Barstool
      * @return boolean
      * @author Ed Finkler
      */
-    public function save($obj, $callback) {
+    public function save($obj, $callback=null) {
         return $this->adaptor->save($obj, $callback);
     }
 
@@ -89,7 +92,7 @@ class Barstool
      * @return void
      * @author Ed Finkler
      */
-    public function get($key, $callback) {
+    public function get($key, $callback=null) {
         return $this->adaptor->get($key, $callback);
     }
     
@@ -102,7 +105,7 @@ class Barstool
      * @return boolean
      * @author Ed Finkler
      */
-    public function exists($key, $callback) {
+    public function exists($key, $callback=null) {
         return $this->adaptor->exists($key, $callback);
     }
 
@@ -114,7 +117,7 @@ class Barstool
      * @return array
      * @author Ed Finkler
      */
-    public function all($callback) {
+    public function all($callback=null) {
         return $this->adaptor->all($callback);
     }
     
@@ -127,7 +130,7 @@ class Barstool
      * @return boolean
      * @author Ed Finkler
      */
-    public function remove($keyOrObj, $callback) {
+    public function remove($keyOrObj, $callback=null) {
         return $this->adaptor->remove($keyOrObj, $callback);
     }
     
@@ -139,7 +142,7 @@ class Barstool
      * @return Barstool
      * @author Ed Finkler
      */
-    public function nuke($callback) {
+    public function nuke($callback=null) {
         $this->adaptor->nuke($callback);
         return $this;
     }
@@ -155,7 +158,7 @@ class Barstool
 	 * @return array|boolean
 	 * @author Ed Finkler
 	 */
-    public function find($condition, $callback) {
+    public function find($condition, $callback=null) {
         
     }
     
