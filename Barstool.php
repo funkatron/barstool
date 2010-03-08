@@ -159,7 +159,7 @@ class Barstool
 	 * @author Ed Finkler
 	 */
     public function find($condition, $callback=null) {
-        
+        $this->adaptor->find($condition, $callback);
     }
     
     /**
@@ -172,7 +172,7 @@ class Barstool
      * @author Ed Finkler
      */
     public function each($callback) {
-        # code...
+        $this->adaptor->each($callback);
     }
     
 }
