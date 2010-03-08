@@ -32,15 +32,15 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
         
         if (is_array($options)) {
             
-            if ($options['name']) {
+            if (isset($options['name']) && $options['name']) {
                 $this->name = $options['name'];
             }
             
-            if ($options['table']) {
+            if (isset($options['table']) && $options['table']) {
                 $this->table = $options['table'];
             }
             
-            if ($options['sqlite_directory']) {
+            if (isset($options['sqlite_directory']) && $options['sqlite_directory']) {
                 $this->sqlite_directory = $options['sqlite_directory'];
             } else {
                 $this->sqlite_directory = getcwd(); // default, set here b/c we can't in property def
@@ -132,7 +132,7 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
      * @return boolean
      * @author Ed Finkler
      */
-    public function exists($key) {
+    public function exists($key, $callback=null) {
         $sql = 'SELECT id FROM '.sqlite_escape_string($this->table) . ' ' .
                 ' WHERE id=\''.sqlite_escape_string($key).'\'';
         $rs = $this->db->query($sql);
@@ -170,10 +170,10 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
     public function remove($keyOrObj, $callback=null) {
         if (is_string($keyOrObj)) {
             $sql = "DELETE FROM ".sqlite_escape_string($this->table)." ".
-                    "WHERE id='".sqlite_escape_string($keyOrObj)."'"
+                    "WHERE id='".sqlite_escape_string($keyOrObj)."'";
         } else {
             $sql = "DELETE FROM ".sqlite_escape_string($this->table)." ".
-                    "WHERE value='".sqlite_escape_string($this->serialize($keyOrObj))."'"
+                    "WHERE value='".sqlite_escape_string($this->serialize($keyOrObj))."'";
         }
         $this->db->query($sql);
     }
