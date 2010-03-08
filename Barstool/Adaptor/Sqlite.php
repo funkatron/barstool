@@ -99,7 +99,17 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
                         'timestamp='.sqlite_escape_string($timestamp).
                     ' WHERE id=\''.sqlite_escape_string($key).'\'';
         }
-        $rs = $this->db->query($sql);        
+        $rs = $this->db->query($sql);
+        
+        if ($callback) {
+            if (is_callable($callback)) {
+                call_user_func($callback, $obj);
+            } else {
+                throw new Exception('Callback passed is not callable');
+            }
+        }
+        
+        return $obj;
     }
 
 
@@ -118,7 +128,17 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
         $rs = $this->db->query($sql);
         if ($rs && $rs->numRows() > 0) {
             $row = $rs->fetch();
-            return $this->deserialize($row['value']);
+            $obj = $this->deserialize($row['value']);
+            
+            if ($callback) {
+                if (is_callable($callback)) {
+                    call_user_func($callback, $obj);
+                } else {
+                    throw new Exception('Callback passed is not callable');
+                }
+            }
+            
+            return $obj;
         } else {
             return false;
         }    
@@ -137,6 +157,13 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
                 ' WHERE id=\''.sqlite_escape_string($key).'\'';
         $rs = $this->db->query($sql);
         if ($rs && $rs->numRows() > 0) {
+            if ($callback) {
+                if (is_callable($callback)) {
+                    call_user_func($callback, true);
+                } else {
+                    throw new Exception('Callback passed is not callable');
+                }
+            }
             return true;
         } else {
             return false;
@@ -147,6 +174,8 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
     /**
      * retrieves an array of all rows
      *
+     * the first argument is the callback. Any additional params are passed as additional parameters to the callback function
+     * 
      * @todo support callback
      * @param string|function $callback 
      * @return array
@@ -155,7 +184,27 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
     public function all($callback=null) {
         $sql = "SELECT id, value, timestamp FROM '".sqlite_escape_string($this->table)."'";
         $rs = $this->db->unbufferedQuery($sql);
-        return $rs->fetchAll(SQLITE_ASSOC);
+        $rows = array();
+        while($row = $rs->fetch(SQLITE_ASSOC)) {
+            $obj = $this->deserialize($row['value']);
+            $obj->key = $row['id'];
+            $rows[$row['id']] = $obj;            
+        }
+        if ($callback) {
+            if (is_callable($callback)) {
+                if (func_num_args() > 1) {
+                    $cb_args = array_slice(func_get_args(), 1); // remove the $callback arg
+                    array_unshift($cb_args, $rows); // prepend $rows as the first arg
+                    call_user_func_array($callback, $cb_args);
+                } else {
+                    call_user_func($callback, $rows);
+                }
+                
+            } else {
+                throw new Exception('Callback passed is not callable');
+            }
+        }
+        return $rows;
     }
     
     /**
@@ -176,6 +225,14 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
                     "WHERE value='".sqlite_escape_string($this->serialize($keyOrObj))."'";
         }
         $this->db->query($sql);
+        if ($callback) {
+            if (is_callable($callback)) {
+                call_user_func($callback);
+            } else {
+                throw new Exception('Callback passed is not callable');
+            }
+        }
+        
     }
     
     /**
@@ -189,6 +246,13 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
     public function nuke($callback=null) {
         $sql = "DELETE FROM ".sqlite_escape_string($this->table);
         $this->db->query($sql);
+        if ($callback) {
+            if (is_callable($callback)) {
+                call_user_func($callback);
+            } else {
+                throw new Exception('Callback passed is not callable');
+            }
+        }
     }
 }
 

@@ -62,10 +62,59 @@ class Barstool_Adaptor
     public function nuke($callback=null) {
     }
     
+    
+    
     public function find($condition, $callback=null) {
+        $cb = array($this, 'findIterator');
+        $this->all($cb, $condition, $callback);
     }
     
+    
+    /**
+     * an iteration function that calls the callback on each object that meets the conditions.
+     * Intended to be used from Barstool_Adaptor::find
+     *
+     * @param array $objs 
+     * @param callback $condition
+     * @param callback $callback 
+     * @return void
+     * @author Ed Finkler
+     */
+    protected function findIterator($objs, $condition, $callback) {
+        $matches = array();
+        foreach ($objs as $obj) {
+            array_push($matches, $obj);
+            if (call_user_func($condition, $obj)) {
+                call_user_func($callback, $obj);
+            }
+        }
+    }
+    
+    /**
+     * Applies a callback to all records in the store
+     *
+     * @param callback $callback 
+     * @return void
+     * @author Ed Finkler
+     */
     public function each($callback) {
+        $cb = array($this, 'eachIterator');
+        $this->all($cb, $callback);
+    }
+    
+    /**
+     * a simple iteration function that calls the callback on each object.
+     * Intended to be used from Barstool_Adaptor::each
+     *
+     * @param array $objs 
+     * @param callback $callback 
+     * @return void
+     * @author Ed Finkler
+     */
+    protected function eachIterator($objs, $callback) {
+        foreach ($objs as $obj) {
+            call_user_func($callback, $obj);
+        }
     }
     
     /**
