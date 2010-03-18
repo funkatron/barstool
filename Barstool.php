@@ -61,7 +61,7 @@ class Barstool
                 dirname(__FILE__)
                 .DIRECTORY_SEPARATOR.'Barstool'
                 .DIRECTORY_SEPARATOR.'Adaptor'
-                .DIRECTORY_SEPARATOR.$options['adaptor'].'.php'
+                .DIRECTORY_SEPARATOR.ucfirst(strtolower($options['adaptor'])).'.php'
             );
             $this->adaptor = new $this->adaptors[$options['adaptor']]($options);
             return true;
@@ -175,6 +175,10 @@ class Barstool
         $this->adaptor->each($callback);
     }
     
+
+
+	
+	
 }
 
 
