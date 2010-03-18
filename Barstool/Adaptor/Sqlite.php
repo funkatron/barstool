@@ -77,6 +77,14 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
      * @author Ed Finkler
      */
     public function save($obj, $callback=null) {
+        
+        /*
+         if this is an associative array, convert it to a stdClass object first
+        */
+        if (is_array($obj) && $this->isAssoc($obj)) {
+            $obj = $this->assocToObject($obj);
+        }
+        
         if (!$obj->key) {
             $key = $this->uuid();
         } else {

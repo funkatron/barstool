@@ -179,6 +179,33 @@ class Barstool_Adaptor
         return round(microtime(true)*1000);
     }
 
+
+    	/**
+	 * reports if an array is associative
+	 *
+	 * @param array $array
+	 * @return boolean
+	 */
+	protected function isAssoc($array) {
+		if ( !is_array($_array) || empty($array) ) {
+			return -1;
+		}
+		foreach (array_keys($_array) as $k => $v) {
+			if ($k !== $v) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * converts an associative array to an object by encoding and decoding json
+	 * @param array $assoc an associative array
+	 * @return stdClass
+	 */
+	protected function assocToObject($assoc) {
+		return json_decode(json_encode($assoc));
+	}
 }
 
 
