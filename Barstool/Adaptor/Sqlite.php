@@ -85,7 +85,7 @@ class Barstool_Adaptor_Sqlite extends Barstool_Adaptor
             $obj = $this->assocToObject($obj);
         }
         
-        if (!$obj->key) {
+        if (!isset($obj->key) || !$obj->key) {
             $key = $this->uuid();
         } else {
             $key = $obj->key;
