@@ -187,10 +187,10 @@ class Barstool_Adaptor
 	 * @return boolean
 	 */
 	protected function isAssoc($array) {
-		if ( !is_array($_array) || empty($array) ) {
+		if ( !is_array($array) || empty($array) ) {
 			return -1;
 		}
-		foreach (array_keys($_array) as $k => $v) {
+		foreach (array_keys($array) as $k => $v) {
 			if ($k !== $v) {
 				return true;
 			}
