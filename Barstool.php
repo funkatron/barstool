@@ -24,6 +24,7 @@ class Barstool
     
     protected $adaptors = array(
         'sqlite'=>'Barstool_Adaptor_Sqlite',
+        'pdo'=>'Barstool_Adaptor_Pdo',
         'textfile'=>'Barstool_Adaptor_Textfile'
     );
     
