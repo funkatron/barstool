@@ -10,107 +10,173 @@ class BarstoolTest extends PHPUnit_Framework_TestCase {
     
     public $webSourceCount = 0;
 
+
+    public static function provider() {
+        $stools = array();
+
+        if (extension_loaded('SQLite')) {
+            $stool_sqlite = new Barstool(array('adaptor'=>'sqlite'));
+            $stool_sqlite->nuke();
+            $stools[] = array($stool_sqlite);
+        }
+        
+        if (extension_loaded('pdo_sqlite')) {
+            $stool_pdo_sqlite = new Barstool(array('adaptor'=>'pdo', 'pdo_dsn'=>'sqlite:Lawnchair_pdo.sqlite.db'));
+            $stool_pdo_sqlite->nuke();
+            $stools[] = array($stool_pdo_sqlite);
+        }
+        
+		return $stools;
+    }
+
 	protected function setUp() {
-		$this->stool = new Barstool(array('adaptor'=>'sqlite'));
-		$this->stool->nuke();
 		$fixture_file_path = dirname(__FILE__).DIRECTORY_SEPARATOR."fixtures".DIRECTORY_SEPARATOR."public_timeline.json";
 		$this->fixture = json_decode(file_get_contents($fixture_file_path));
         $this->webSourceCount = 0;
 	}
 	
 
-    public function testGet1() {
-        
-    }
-
-	public function testExists1() {
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testExists1($stool) {
 		$obj = new stdClass;
 		$obj->key = 'testdata';
 		$obj->foo = 'bar';
-		$this->stool->save($obj);
-		$rs = $this->stool->exists('testdata');
+		$stool->save($obj);
+		$rs = $stool->exists('testdata');
 		
 		$this->assertTrue($rs);
+		$stool->nuke();
 	}
 
-
-	public function testRemove1() {
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testRemove1($stool) {
 		$obj = new stdClass;
-		$rs = $this->stool->remove('testdata');
+		$rs = $stool->remove('testdata');
 		$this->assertNull($rs);
+		$stool->nuke();
 	}
 
 	
-	public function testSave1() {
+	
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testSave1($stool) {
 		$obj = new stdClass;
 		$obj->key = 'testdata';
 		$obj->foo = 'bar';
-		$this->stool->save($obj);
-		$rs = $this->stool->get('testdata');
+		$stool->save($obj);
+		$rs = $stool->get('testdata');
 		
 		$this->assertEquals($rs->foo, 'bar', 'testdata obj foo != "bar"');
+		$stool->nuke();
 	}
 	
 	
 	
 	
-	public function testSave2() {
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testSave2($stool) {
 		$arr = array(
 			'key'=>'testdata2',
 			'foo'=>'barboo'
 		);
-		$this->stool->save($arr);
-		$rs = $this->stool->get('testdata2');
+		$stool->save($arr);
+		$rs = $stool->get('testdata2');
 		
 		$this->assertEquals($rs->foo, 'barboo', 'Assoc array should have been retrieved as a stdClass object');
+		$stool->nuke();
 	}
+
+
 	
-	public function testAll1() {
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testAll1($stool) {
 	    /*
 	       set-up the fixture
 	    */
 	    foreach ($this->fixture as $thisobj) {
-		    $this->stool->save($thisobj);
+		    $stool->save($thisobj);
 		}
-	    $all = count($this->stool->all());
+	    $all = count($stool->all());
 	    $this->assertEquals($all, 20, 'Twenty entries should exist');
+	    $stool->nuke();
 	}
+
+    /**
+     * This function demonstrates usage of an anonymous function as a callback
+     * 
+     * It will only work under PHP >= 5.3.0. Commented out for now.
+     * 
+     * @dataProvider provider
+     * @return void
+     * @author Ed Finkler
+     */
+    // public function testFind1($stool) {
+    //     /*
+    //        set-up the fixture
+    //     */
+    //     foreach ($this->fixture as $thisobj) {
+    //         $stool->save($thisobj);
+    //     }
+    //         
+    //     if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+    //         /*
+    //             use a closure if we can
+    //         */
+    //         $that = $this;
+    //         $stool->find(function($obj) use ($that) {
+    //             if ($obj->source === 'web') {
+    //                 $that->webSourceCount++;
+    //             }
+    //         });
+    //         $this->assertEquals($this->webSourceCount, 5, "There should be 5 web posts");
+    //     } else {
+    //         $this->markTestSkipped('PHP Version is < 5.3.0');
+    //     }
+    // }
 	
-	public function testFind1() {
+	
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testFind2($stool) {
 	    /*
 	       set-up the fixture
 	    */
 	    foreach ($this->fixture as $thisobj) {
-		    $this->stool->save($thisobj);
+		    $stool->save($thisobj);
 		}
         
-        if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
-            /*
-                use a closure if we can
-            */
-            $that = $this;
-            $this->stool->find(function($obj) use ($that) {
-                if ($obj->source === 'web') {
-                    $that->webSourceCount++;
-                }
-            });
-            $this->assertEquals($this->webSourceCount, 5, "There should be 5 web posts");
-        } else {
-            $this->markTestSkipped('PHP Version is < 5.3.0');
-        }
-	}
-	
-	
-	public function testFind2() {
-	    /*
-	       set-up the fixture
-	    */
-	    foreach ($this->fixture as $thisobj) {
-		    $this->stool->save($thisobj);
-		}
-        
-        $this->stool->find(array($this, 'addWebSourceCount'));
+        $stool->find(array($this, 'addWebSourceCount'));
         $this->assertEquals($this->webSourceCount, 2, "There should be 2 TweetDeck posts");
+        $stool->nuke();
 	}
 	
 	/**
@@ -126,15 +192,22 @@ class BarstoolTest extends PHPUnit_Framework_TestCase {
         }	    
 	}
 	
-	public function testEach1() {
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testEach1($stool) {
 	    /*
 	       set-up the fixture
 	    */
 	    foreach ($this->fixture as $thisobj) {
-		    $this->stool->save($thisobj);
+		    $stool->save($thisobj);
 		}
 		
-		$this->stool->each(array($this,'userAttrExists'));
+		$stool->each(array($this,'userAttrExists'));
+        $stool->nuke();
 	}
 	
 	/**
@@ -149,16 +222,22 @@ class BarstoolTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	
-	public function testNuke1() {	    
+    /**
+     * @dataProvider provider
+     *
+     * @return void
+     * @author Ed Finkler
+     */
+	public function testNuke1($stool) {	    
 	    /*
 	       set-up the fixture
 	    */
 	    foreach ($this->fixture as $thisobj) {
-		    $this->stool->save($thisobj);
+		    $stool->save($thisobj);
 		}
 	    
-	    $none = $this->stool->nuke();
-	    $all  = count($this->stool->all());
+	    $none = $stool->nuke();
+	    $all  = count($stool->all());
 	    $this->assertEquals($all, 0, 'All entries removed by nuke');
 	}
 	
