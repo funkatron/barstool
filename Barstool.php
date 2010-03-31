@@ -177,7 +177,9 @@ class Barstool
     }
     
 
-
+	public function setReturnAssocArray($state) {
+		$this->adaptor->setReturnAssocArray($state);
+	}
 	
 	
 }

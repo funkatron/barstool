@@ -38,10 +38,18 @@ class Barstool_Adaptor
         }
     }
     
+    /**
+     * whether or not we should return JSON objects as associative arrays
+     *
+     * @param boolean $state if true, objects stored will be returned as associative arrays
+     */
+    public function setReturnAssocArray($state) {
+        $this->return_assoc_arrays = (bool)$state;
+    }
     
     public function save($obj, $callback=null) {
     }
-
+ 
     public function get($key, $callback=null) {
         
     }

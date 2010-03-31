@@ -35,6 +35,14 @@ unset($obj);
 $obj = $bs->get('foobarthing');
 var_dump($obj);
 
+
+/*
+    retrieve it as an associative array
+*/
+$bs->setReturnAssocArray(true);
+$obj = $bs->get('foobarthing');
+var_dump($obj);
+
 // $obj = $bs->get('poop');
 // var_dump($obj);
 

@@ -26,7 +26,9 @@ class Barstool_Adaptor_Pdo extends Barstool_Adaptor
      * @author Ed Finkler
      */
     protected function init($options) {
-
+        
+        parent::init($options);
+        
         if (is_string($options)) {
             $name = $options;
             $options = array('table'=>$name);
