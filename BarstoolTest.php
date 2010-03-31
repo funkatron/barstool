@@ -103,6 +103,13 @@ class BarstoolTest extends PHPUnit_Framework_TestCase {
 		$rs = $stool->get('testdata2');
 		
 		$this->assertEquals($rs->foo, 'barboo', 'Assoc array should have been retrieved as a stdClass object');
+		
+		$stool->setReturnAssocArray(true);
+		$rs = $stool->get('testdata2');
+		$this->assertEquals($rs['foo'], 'barboo', 'Assoc array should have been retrieved as array');
+		
+		$stool->setReturnAssocArray(false);
+
 		$stool->nuke();
 	}
 

@@ -33,7 +33,7 @@ class Barstool_Adaptor
     }
     
     protected function init($options) {
-        if ($options['return_assoc_arrays']) {
+        if ($options && isset($options['return_assoc_arrays']) && $options['return_assoc_arrays']) {
             $this->return_assoc_arrays = true;
         }
     }
